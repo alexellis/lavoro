@@ -2,6 +2,8 @@
 
 An experimental CLI which runs a long-running container, then prints out its logs.
 
+This could be easier than remembering the syntax for `kubectl run` for when you want to debug a service using `curl` - or just to run a long-running batch-job, getting the result at the end.
+
 ## Status
 
 lavoro uses the Kubernetes API and Go client to schedule a Kubernetes job.
@@ -9,6 +11,28 @@ lavoro uses the Kubernetes API and Go client to schedule a Kubernetes job.
 Future work would include the use of informers and caches for efficiency.
 
 ## Examples
+
+### Debug a network issue with curl
+
+```bash
+kubectl run nginx --image nginx --port 8080
+kubectl expose pod nginx --type ClusterIP --port 8080 --target-port 80
+
+lavoro run --name curl1 \
+  --image curlimages/curl:latest \
+  --command "curl -s http://nginx:8080"
+
+2020/10/30 16:02:35 Accepted: {curl1 default {curlimages/curl:latest [curl -s http://nginx:8080]}}
+curl1-1604073755
+2020/10/30 16:02:35 curl1-1604073755
+2020/10/30 16:02:36 Pending
+2020/10/30 16:02:37 Succeeded
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+...
+```
 
 ### Ping
 
