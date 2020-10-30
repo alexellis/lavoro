@@ -2,52 +2,69 @@
 
 An experiment in running a job until completion with the Kubernetes API
 
-## Running the example:
+## Examples
+
+### Ping
 
 ```bash
-go build && ./lavoro 
-2020/10/27 22:33:37 Accepted: {ping default {alpine:3.12 [ping -c 5 google.com]}}
-ping-1603838017
-2020/10/27 22:33:37 ping-1603838017
-2020/10/27 22:33:39 Pending
-2020/10/27 22:33:40 Running
-2020/10/27 22:33:45 Succeeded
-PING google.com (216.58.206.142): 56 data bytes
-64 bytes from 216.58.206.142: seq=0 ttl=116 time=2.410 ms
-64 bytes from 216.58.206.142: seq=1 ttl=116 time=1.763 ms
-64 bytes from 216.58.206.142: seq=2 ttl=116 time=1.347 ms
-64 bytes from 216.58.206.142: seq=3 ttl=116 time=1.237 ms
-64 bytes from 216.58.206.142: seq=4 ttl=116 time=1.221 ms
+lavoro run --image alpine:3.12 \
+  --command "ping -c 4 google.com"
+
+2020/10/30 15:50:14 Accepted: {job default {alpine:3.12 [ping -c 4 google.com]}}
+job-1604073014
+2020/10/30 15:50:14 job-1604073014
+2020/10/30 15:50:15 Pending
+2020/10/30 15:50:16 Running
+2020/10/30 15:50:17 Running
+2020/10/30 15:50:18 Running
+2020/10/30 15:50:19 Succeeded
+PING google.com (216.58.212.238): 56 data bytes
+64 bytes from 216.58.212.238: seq=0 ttl=36 time=16.759 ms
+64 bytes from 216.58.212.238: seq=1 ttl=36 time=20.031 ms
+64 bytes from 216.58.212.238: seq=2 ttl=36 time=13.693 ms
+64 bytes from 216.58.212.238: seq=3 ttl=36 time=14.424 ms
 
 --- google.com ping statistics ---
-5 packets transmitted, 5 packets received, 0% packet loss
-round-trip min/avg/max = 1.221/1.595/2.410 ms
-2020/10/27 22:33:45 Deleting job ping-1603838017..OK.
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 13.693/16.226/20.031 ms
+2020/10/30 15:50:19 Deleting job job-1604073014..OK.
 ```
 
-With a web-scrape:
+### Web-scraping with Pupeteer
+
+This runs integration tests with `mocha` which visit the inlets blog to check it's up.
 
 ```bash
-go build && ./lavoro 2020/10/27 22:22:44 Accepted: {check-inlets default {alexellis2/check-inlets [mocha --recursive ./integration-tests]}}
-check-inlets-1603837364
-2020/10/27 22:22:44 check-inlets-1603837364
-2020/10/27 22:22:44 Pending
-2020/10/27 22:22:45 Pending
-2020/10/27 22:22:46 Pending
-2020/10/27 22:22:47 Running
-2020/10/27 22:22:48 Running
-2020/10/27 22:22:49 Succeeded
+lavoro run --name inlets-check \
+  --image alexellis2/check-inlets \
+  --command "mocha --recursive ./integration-tests"
+
+2020/10/30 15:52:08 Accepted: {inlets-check default {alexellis2/check-inlets [mocha --recursive ./integration-tests]}}
+inlets-check-1604073128
+2020/10/30 15:52:08 inlets-check-1604073128
+2020/10/30 15:52:08 Pending
+2020/10/30 15:52:09 Pending
+2020/10/30 15:52:10 Running
+2020/10/30 15:52:11 Running
+2020/10/30 15:52:12 Running
+2020/10/30 15:52:13 Succeeded
+
+
 Started HeadlessChrome/85.0.4182.0
   inlets blog
 Promise { <pending> }
-    ✓ renders OK (1863ms)
-  1 passing (2s)
-2020/10/27 22:22:50 Deleting job check-inlets-1603837364..OK.
+    ✓ renders OK (2722ms)
+
+
+  1 passing (3s)
+
+2020/10/30 15:52:13 Deleting job inlets-check-1604073128..OK.
 ```
 
 ## Example workloads
 
 Web scraping with:
+
 * [puppeteer](https://github.com/puppeteer/puppeteer)
 * [scrapy](https://scrapy.org)
 * [Selenium](https://www.selenium.dev)
