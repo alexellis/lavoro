@@ -1,6 +1,12 @@
-# lavoro
+# lavoro (work/job)
 
-An experiment in running a job until completion with the Kubernetes API
+An experimental CLI which runs a long-running container, then prints out its logs.
+
+## Status
+
+lavoro uses the Kubernetes API and Go client to schedule a Kubernetes job.
+
+Future work would include the use of informers and caches for efficiency.
 
 ## Examples
 
